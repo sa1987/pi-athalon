@@ -1,0 +1,103 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Feb 15 03:03:04 2018
+
+@author: assurend
+"""
+
+import RPi.GPIO as IO
+import time
+
+IO.setwarnings(False)
+IO.setmode (IO.BOARD)
+
+IO.setup(31,IO.IN) #GPIO 6 -> Left IR in
+IO.setup(33,IO.IN) #GPIO 13 -> Middle IR in
+IO.setup(35,IO.IN) #GPIO 19 -> Right IR in
+
+IO.setup(7,IO.OUT) #GPIO 4 -> Motor Left Wheel terminal A
+IO.setup(11,IO.OUT) #GPIO 17 -> Motor Left Wheel terminal B
+
+IO.setup(13,IO.OUT) #GPIO 27 -> Motor Right Wheel terminal A
+IO.setup(15,IO.OUT) #GPIO 22 -> Motor Right Wheel terminal B
+
+#IO.setup(31, IO.IN, pull_up_down = IO.PUD_DOWN)
+#IO.setup(33, IO.IN, pull_up_down = IO.PUD_DOWN)
+#IO.setup(35, IO.IN, pull_up_down = IO.PUD_DOWN)
+
+#IO.output(7,True)
+#IO.output(11,False)
+#IO.output(13,True)
+#IO.output(15,False)
+#IR_S1=IO.input(31)
+#IR_S2=IO.input(33)
+#IR_S3=IO.input(35)
+def move_fwd(): # define function to move forward
+    print ("Rotating both motors in clockwise direction")
+    IO.output(7,1)
+    IO.output(11,0)
+    IO.output(13,1)
+    IO.output(15,0)
+    time.sleep(.1)
+def stop(): # define function to stop
+    print ("stopping the motors")
+    IO.output(7,1)
+    IO.output(11,1)
+    IO.output(13,1)
+    IO.output(15,1)
+    time.sleep(.1)
+
+def move_right(): # define function to turn right
+    print ("Rotating to right")
+    IO.output(7,0)
+    IO.output(11,0)
+    IO.output(13,0)
+    IO.output(15,1)
+    time.sleep(.1) 
+
+def move_left(): # define function to stop
+    print ("Rotating to left")
+    IO.output(7,1)
+    IO.output(11,0)
+    IO.output(13,0)
+    IO.output(15,0)
+    time.sleep(.1)
+    
+def move_back(): # define function to reverse
+    print ("Rotating anti clockwise")
+    IO.output(7,0)
+    IO.output(11,1)
+    IO.output(13,0)
+    IO.output(15,1)
+    time.sleep(.1)
+
+def main():
+  print("Ready..Set..GO")
+  time.sleep(.5)
+  S = True
+  while S: # Entering the infinite loop
+      try:
+            IR_S1=IO.input(31) # assigning the value sensor 1
+            IR_S2=IO.input(33) # assigning the value sensor 1
+            IR_S3=IO.input(35) # assigning the value sensor 1
+            print("first:" + str(IO.input(31)) + "  second:" + str(IO.input(33)) + "   third:" + str(IO.input(35)))
+            time.sleep(0.1)
+            if(IR_S1==1 and IR_S2==0 and IR_S3==1 ):
+                move_fwd()
+            elif((IR_S1==1 and IR_S2==0 and IR_S3==0) or (IR_S1==1 and IR_S2==1 and IR_S3==0)):
+                move_left()
+            elif((IR_S1==0 and IR_S2==0 and IR_S3==1) or (IR_S1==0 and IR_S2==1 and IR_S3==1)):
+                move_right()
+            elif((IR_S1==1 and IR_S2==1 and IR_S3==1) or (IR_S1==1 and IR_S2==1 and IR_S3==1)):
+                move_back()
+            else:
+                stop()
+      except (KeyboardInterrupt,SystemExit):
+          stop()
+          IO.cleanup()
+          print ("exiting")
+          
+main()
+
+#if __name__== "__main__":
+#  main()
